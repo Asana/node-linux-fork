@@ -1,0 +1,15 @@
+{
+  "name": "fork",
+  "version": "0.0.1",
+  "description": "Supports fork() call in Node.JS (requires a patched node installation)",
+  "main": "fork.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "author": "",
+  "license": "BSD",
+  "engines": {
+    "node": "0.10.7-fork-support"
+  }
+}
