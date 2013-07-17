@@ -17,7 +17,7 @@ v8::Handle<v8::Value> Fork(const v8::Arguments& args) {
 
 void init(v8::Handle<v8::Object> exports) {
   exports->Set(
-    v8::String::NewSymbol("hello"),
+    v8::String::NewSymbol("fork"),
     v8::FunctionTemplate::New(Fork)->GetFunction());
 }
 
