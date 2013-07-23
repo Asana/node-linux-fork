@@ -1,4 +1,5 @@
 #include <node.h>
+#include <uv.h>
 #include <v8.h>
 #include <unistd.h>
 
@@ -7,6 +8,7 @@ v8::Handle<v8::Value> Fork(const v8::Arguments& args) {
   {
     v8::Unlocker unlocker;
     v8::V8::PrepareToFork();
+    uv_suspend_worker_threads();
     res = fork();
     v8::V8::AfterForking();
   }
