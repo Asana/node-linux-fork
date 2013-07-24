@@ -1,1 +1,1 @@
-module.exports = require("bindings")("fork.node").fork; 
+module.exports = require("bindings")("fork.node"); 
