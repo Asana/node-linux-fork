@@ -37,6 +37,18 @@ static void stop_sigchld_handler() {
   }
 }
 
+static void make_nonblocking(int fd) {
+  int flags = fcntl(fd, F_GETFL, 0);
+  if (flags == -1) {
+    perror("F_GETFL failed");
+    abort();
+  }
+  if (fcntl(fd, F_SETFL, flags | O_NONBLOCK)) {
+    perror("F_SETFL failed");
+    abort();
+  }
+}
+
 v8::Handle<v8::Value> Fork(const v8::Arguments& args) {
   v8::HandleScope scope;
   int res = -1;
@@ -67,6 +79,8 @@ v8::Handle<v8::Value> Fork(const v8::Arguments& args) {
         perror("Cannot open child stdout");
         abort();
       }
+      make_nonblocking(stdin_fd);
+      make_nonblocking(stdout_fd);
       if (dup2(stdin_fd, STDIN_FILENO) == -1 || dup2(stdout_fd, STDOUT_FILENO) == -1) {
         abort();
       }  
