@@ -1,5 +1,6 @@
 #include <node.h>
 #include <uv.h>
+#include <openssl/rand.h>
 #include <v8.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -87,6 +88,7 @@ v8::Handle<v8::Value> Fork(const v8::Arguments& args) {
       close(stdin_fd);
       close(stdout_fd);
       uv_after_fork();
+      RAND_cleanup();
     }
     v8::V8::AfterForking();
   }
