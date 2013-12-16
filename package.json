@@ -1,6 +1,6 @@
 {
   "name": "linux-fork",
-  "version": "0.0.1",
+  "version": "0.0.1-patch4",
   "description": "Supports a fork() call in Node.JS (only in linux and requires a patched node installation)",
   "main": "./fork.js",
   "scripts": {
