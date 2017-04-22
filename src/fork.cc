@@ -50,20 +50,20 @@ static void make_nonblocking(int fd) {
   }
 }
 
-v8::Handle<v8::Value> Fork(const v8::Arguments& args) {
-  v8::HandleScope scope;
+void Fork(const v8::FunctionCallbackInfo<v8::Value>& info) {
+  v8::Isolate* isolate = info.GetIsolate();
   int res = -1;
-  if (args.Length() < 2 || !args[0]->IsString() || !args[1]->IsString()) {
-    v8::ThrowException(v8::Exception::TypeError(v8::String::New(
+  if (info.Length() < 2 || !info[0]->IsString() || !info[1]->IsString()) {
+    isolate->ThrowException(v8::Exception::TypeError(v8::String::NewFromUtf8(
+      isolate,
       "Ivalid arguments for fork: (stdin_filename, stout_filename) expected")));
-    return scope.Close(v8::Undefined());
+    return;
   }
-  v8::String::Utf8Value stdin_filename(args[0]);
-  v8::String::Utf8Value stdout_filename(args[1]);
+  v8::String::Utf8Value stdin_filename(info[0]);
+  v8::String::Utf8Value stdout_filename(info[1]);
   {
-    v8::Unlocker unlocker;
+    v8::Unlocker unlocker(isolate);
     start_sigchld_handler();
-    v8::V8::PrepareToFork();
     uv_suspend_worker_threads();
     res = fork();
     setsid();
@@ -90,24 +90,18 @@ v8::Handle<v8::Value> Fork(const v8::Arguments& args) {
       uv_after_fork();
       RAND_cleanup();
     }
-    v8::V8::AfterForking();
   }
 
-  return scope.Close(v8::Integer::New(res));
+  info.GetReturnValue().Set(res);
 }
 
-v8::Handle<v8::Value> Getpid(const v8::Arguments& args) {
-  v8::HandleScope scope;
-  return scope.Close(v8::Integer::New(getpid()));
+void Getpid(const v8::FunctionCallbackInfo<v8::Value>& info) {
+  return info.GetReturnValue().Set(getpid());
 }
 
-void init(v8::Handle<v8::Object> exports) {
-  exports->Set(
-    v8::String::NewSymbol("forkAndReopenStdio"),
-    v8::FunctionTemplate::New(Fork)->GetFunction());
-  exports->Set(
-    v8::String::NewSymbol("getpid"),
-    v8::FunctionTemplate::New(Getpid)->GetFunction());
+void init(v8::Local<v8::Object> exports) {
+  NODE_SET_METHOD(exports, "forkAndReopenStdio", Fork);
+  NODE_SET_METHOD(exports, "getpid", Getpid);
 }
 
 NODE_MODULE(fork, init);
